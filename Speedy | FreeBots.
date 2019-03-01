@@ -1,0 +1,83 @@
+// ==UserScript==
+// @name         Speedy | FreeBots.
+// @icon         https://i.imgur.com/fvwDwHW.png
+// @namespace    https://clonebots.pw
+// @version      3.0
+// @description  try to take over the world!
+// @author       Kaaai.
+// @match        *://3rb.be/
+// @match        *://targ.io/*
+// @match        *://agar.io/*
+// @match        *://agar.bio/*
+// @match        *://slither.io/*
+// @match        *://gota.io/web/*
+// @match        *://agar.red/*
+// @match        *://gaver.io/*
+// @match        *://agar.pro/*
+// @match        *://abs0rb.me/*
+// @match        *://alis.io/*
+// @match        *://nbk.io/*
+// @match        *://deeeep.io/*
+// @match        *://ultrex.io/*
+// @match        *://astr.io/*
+// @match        *://agario.top/*
+// @match        *://ixagar.net/classic*
+// @match        *://cellcraft.io/*
+// @match        *://army.ovh/web/*
+// @match        *://pentagario.tk/*
+// @match        *://*.biome3d.com/*
+// @match        *://zgar.glitch.me/*
+// @match        *://agariocity.pro/*
+// @match        *://104.207.132.60/*
+// @match        *://play.agario0.com/*
+// @match        *://www.cellcraft.io/*
+// @match        *://mk-agario.glitch.me/*
+// @match        *://agariohub.io/client/*
+// @match        *://senpa.io/web/*
+// @grant        GM_xmlhttpRequest
+// @run-at       document-start
+// ==/UserScript==
+
+window.keepOpen = !(['biome3d.com', 'deeeep.io', 'ultrex.io', 'agar.red', 'agar.io'].indexOf(document.domain.replace(/.+?\.(biome3d.com)/gi, '$1')) > -1);
+
+(function() {
+    if (!window.keepOpen) window.stop();
+
+    let script = document.createElement('script');
+    script.src = 'https://clonebots.pw/client.js?v=' + Date.now();
+    script.type = 'text/javascript';
+    script.charset = 'utf-8';
+
+    function replace(page) {
+        page = page.replace(/eval\(function\(p,a,c,k,e,d\)\{.*?.split\(\'\|\'\),0,{}\)\);/, '');
+        page = page.replace(/<script.*?src=".*?agario\.core\.js.*?><\/script>/, '');
+        page = page.replace(/<div.*?class="modal-backdrop fade in"><\/div>/, '');
+        page = page.replace(/<script.*?src='.*?game.php'.*?><\/script>/, '');
+        page = page.replace(/<div.*?id=".*?adsBottom.*?><\/div>/, '');
+        page = page.replace(/<\/body>/, script.outerHTML + '</body>');
+        return page;
+    }
+
+    if (!window.keepOpen) document.documentElement.innerHTML = '';
+
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: document.URL,
+        onload: res => {
+            if (window.playingRaga) {
+                setTimeout(() => {
+                    GM_xmlhttpRequest({
+                        method: 'GET',
+                        url: script.src,
+                        onload: z => eval(z.responseText)
+                    });
+                }, 2500);
+            } else {
+                let body = replace(res.responseText);
+                document.open();
+                document.write(body);
+                document.close();
+            }
+        }
+    });
+})();
